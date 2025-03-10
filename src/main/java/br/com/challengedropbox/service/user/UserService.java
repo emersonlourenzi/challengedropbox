@@ -2,11 +2,13 @@ package br.com.challengedropbox.service.user;
 
 import br.com.challengedropbox.commons.exceptions.user.ErrorSaveUserException;
 import br.com.challengedropbox.commons.exceptions.user.ErrorUserExists;
+import br.com.challengedropbox.commons.exceptions.user.ErrorUserNotExists;
 import br.com.challengedropbox.mapper.user.UserEntityToResponseMapper;
 import br.com.challengedropbox.mapper.user.UserRequestToEntityMapper;
 import br.com.challengedropbox.model.user.request.UserRequest;
 import br.com.challengedropbox.model.user.response.UserResponse;
 import br.com.challengedropbox.repository.user.UserRepository;
+import br.com.challengedropbox.repository.user.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
@@ -56,6 +58,21 @@ public class UserService {
         } catch (NoSuchAlgorithmException e) {
             throw new ErrorSaveUserException();
         }
+    }
+
+    public UserResponse findByEmail(String email) {
+        return Optional.ofNullable(email)
+            .map(this::validadeUserNotExists)
+            .map(UserEntityToResponseMapper::toResponse)
+            .orElseThrow();
+    }
+
+    private UserEntity validadeUserNotExists(String email) {
+        var existsUser = userRepository.findByEmail(email);
+        if (ObjectUtils.isEmpty(existsUser)) {
+            throw new ErrorUserNotExists();
+        }
+        return existsUser;
     }
 
 }

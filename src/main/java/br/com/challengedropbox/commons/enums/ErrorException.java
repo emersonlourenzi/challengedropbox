@@ -15,6 +15,7 @@ public enum ErrorException {
     USER_NOT_FOUND("4", "Usuário não encontrado"),
     EMAIL_USER_EXISTS("5", "Email informado já cadastrado"),
     VALIDATION_ERROR("6", "Erro na válidação dos dados do usuário"),
+    USER_NOT_EXISTS("7", "Usuário informado não encontrado ou não existe"),
     ;
 
     private final String code;
