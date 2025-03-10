@@ -10,6 +10,8 @@ import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/v1/users")
@@ -28,6 +30,12 @@ public class UserRestController {
     @Operation(description = "Busca usuário por email")
     public UserResponse findByEmail(@RequestParam @Email(message = "Email inválido") String email) {
         return userService.findByEmail(email);
+    }
+
+    @GetMapping("/all")
+    @Operation(description = "")
+    public List<UserResponse> findAllUsers() {
+        return userService.findAllUsers();
     }
 
 }

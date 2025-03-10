@@ -3,6 +3,7 @@ package br.com.challengedropbox.service.user;
 import br.com.challengedropbox.commons.exceptions.user.ErrorSaveUserException;
 import br.com.challengedropbox.commons.exceptions.user.ErrorUserExists;
 import br.com.challengedropbox.commons.exceptions.user.ErrorUserNotExists;
+import br.com.challengedropbox.mapper.user.ListUserEntityToResponseMapper;
 import br.com.challengedropbox.mapper.user.UserEntityToResponseMapper;
 import br.com.challengedropbox.mapper.user.UserRequestToEntityMapper;
 import br.com.challengedropbox.model.user.request.UserRequest;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -73,6 +75,10 @@ public class UserService {
             throw new ErrorUserNotExists();
         }
         return existsUser;
+    }
+
+    public List<UserResponse> findAllUsers() {
+        return ListUserEntityToResponseMapper.toListResponse(userRepository.findAll());
     }
 
 }
