@@ -16,3 +16,10 @@
 * Java/Spring;
 * MongoDB;
 * Docker.
+
+
+# Swagger
+http://localhost:9000/challengedropbox/swagger-ui/index.html
+
+### User
+* [POST] Criar usuário 
