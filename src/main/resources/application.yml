@@ -1,6 +1,6 @@
 spring:
   application:
-    name: /user-service
+    name: /challengedropbox
   data:
     mongodb:
       host: localhost
@@ -16,4 +16,4 @@ server:
     include-message: "always"
   port: 9000
   servlet:
-    context-path: /user-service
+    context-path: /challengedropbox
