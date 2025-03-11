@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,9 +34,15 @@ public class UserRestController {
     }
 
     @GetMapping("/all")
-    @Operation(description = "")
+    @Operation(description = "Listar todos os usuários")
     public List<UserResponse> findAllUsers() {
         return userService.findAllUsers();
+    }
+
+    @DeleteMapping
+    @Operation(description = "Deletar usuário")
+    public ResponseEntity<Void> deleteUserByEmail(@RequestParam @Valid String email) {
+        return userService.deleteUserByEmail(email);
     }
 
 }
