@@ -16,6 +16,9 @@ public enum ErrorException {
     EMAIL_USER_EXISTS("5", "Email informado já cadastrado"),
     VALIDATION_ERROR("6", "Erro na válidação dos dados do usuário"),
     USER_NOT_EXISTS("7", "Usuário informado não encontrado ou não existe"),
+    ERROR_CONECT_SERVER_FTP("8", "Ocorreu um erro ao conectar ao servidor FTP"),
+    ERROR_SAVE_FILE("9", "Ocorreu um erro ao salvar arquivo"),
+    ERROR_VERIFY_FILE("9", "Ocorreu um erro ao verificar arquivo"),
     ;
 
     private final String code;

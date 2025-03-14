@@ -13,7 +13,6 @@ import br.com.challengedropbox.repository.user.entity.UserEntity;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
@@ -83,10 +82,9 @@ public class UserService {
         return ListUserEntityToResponseMapper.toListResponse(userRepository.findAll());
     }
 
-    public ResponseEntity<Void> deleteUserByEmail(@Valid String email) {
+    public void deleteUserByEmail(@Valid String email) {
         validadeUserNotExists(email);
         userRepository.deleteByEmail(email);
-        return ResponseEntity.noContent().build();
     }
 
 }
