@@ -1,16 +1,17 @@
 package br.com.challengedropbox.contract.v1.file;
 
+import br.com.challengedropbox.model.file.response.FileResponse;
 import br.com.challengedropbox.model.file.response.FileUploadResponse;
 import br.com.challengedropbox.service.file.FileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -20,11 +21,19 @@ public class FileRestController {
 
     private final FileService fileService;
 
-    @PostMapping("/upload")
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(description = "Upload de arquivos")
-    public FileUploadResponse uploadFile(@RequestParam @Schema(type = "string", format = "binary") MultipartFile file,
-                                         @RequestParam String userId) {
-        return fileService.uploadFile(file, userId);
+    public FileUploadResponse uploadFile(@RequestParam MultipartFile file,
+                                         @RequestParam String idUser) {
+        return fileService.uploadFile(file, idUser);
+    }
+
+    @GetMapping("/user")
+    @Operation(description = "Lista de arquivos do usuário")
+    public List<FileResponse> listFilesUser(@RequestParam String idUser,
+                                            @RequestParam Integer page,
+                                            @RequestParam Integer size) {
+        return fileService.listFilesUser(idUser, page, size);
     }
 
 }
