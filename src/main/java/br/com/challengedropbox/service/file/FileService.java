@@ -6,6 +6,7 @@ import br.com.challengedropbox.commons.exceptions.ftp.ErrorConectFtpException;
 import br.com.challengedropbox.commons.exceptions.ftp.ErrorDisconnectFtpException;
 import br.com.challengedropbox.commons.exceptions.user.ErrorUserNotFoundException;
 import br.com.challengedropbox.mapper.file.FileEntityToUploadResponseMapper;
+import br.com.challengedropbox.model.file.response.FileResponse;
 import br.com.challengedropbox.model.file.response.FileUploadResponse;
 import br.com.challengedropbox.repository.file.FileRepository;
 import br.com.challengedropbox.repository.user.UserRepository;
@@ -17,9 +18,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static br.com.challengedropbox.mapper.file.FileEntityMapper.toFileEntityMapper;
+import static br.com.challengedropbox.mapper.file.FileResponseMapper.INSTANCE;
 
 @Slf4j
 @Service
@@ -73,7 +78,7 @@ public class FileService {
 
             enterDirectoryUser(idUser);
 
-            String newFileName = generateUniqueFileName(file.getOriginalFilename());
+            String newFileName = generateUniqueFileName(Objects.requireNonNull(file.getOriginalFilename()));
             boolean success = ftpClient.storeFile(newFileName, file.getInputStream());
 
             if (success) {
@@ -149,6 +154,44 @@ public class FileService {
             .map(fileRepository::save)
             .map(FileEntityToUploadResponseMapper::toFileUploadResponse)
             .orElseThrow();
+    }
+
+    public List<FileResponse> listFilesUser(String idUser, Integer page, Integer size) {
+        int currentPage = Optional.ofNullable(page)
+            .orElse(1) - 1;
+        int pageSize = Optional.ofNullable(size)
+            .orElse(10);
+
+        try {
+
+            if (!verifyUserExists(idUser)) {
+                throw new ErrorUserNotFoundException();
+            }
+
+            connectServerFTP();
+
+            enterDirectoryUser(idUser);
+
+            List<FileResponse> allFilesUser = INSTANCE.toFileResponseList(ftpClient.listFiles());
+
+            return paginateList(allFilesUser, currentPage, pageSize);
+        } catch (IOException e) {
+            log.error("Erro ao verificar se o arquivo existe no FTP: {}", e.getMessage(), e);
+            throw new ErrorVerifyFileException();
+        } finally {
+            disconnectFTP();
+        }
+    }
+
+    private List<FileResponse> paginateList(List<FileResponse> files, int page, int size) {
+        int fromIndex = page * size;
+        int toIndex = Math.min(fromIndex + size, files.size());
+
+        if (fromIndex >= files.size()) {
+            return Collections.emptyList();
+        }
+
+        return files.subList(fromIndex, toIndex);
     }
 
 }
