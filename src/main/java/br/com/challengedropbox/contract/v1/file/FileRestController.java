@@ -1,12 +1,13 @@
 package br.com.challengedropbox.contract.v1.file;
 
+import br.com.challengedropbox.model.file.request.FileDeleteRequest;
 import br.com.challengedropbox.model.file.response.FileResponse;
 import br.com.challengedropbox.model.file.response.FileUploadResponse;
 import br.com.challengedropbox.service.file.FileService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +35,13 @@ public class FileRestController {
                                             @RequestParam Integer page,
                                             @RequestParam Integer size) {
         return fileService.listFilesUser(idUser, page, size);
+    }
+
+    @DeleteMapping
+    @Operation(description = "Deletar arquivos do usuário")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFilesUser(@RequestBody FileDeleteRequest request) {
+        fileService.deleteFilesUser(request);
     }
 
 }
