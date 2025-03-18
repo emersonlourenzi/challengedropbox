@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FileRepository extends MongoRepository<FileEntity, String> {
+
+    void deleteByNameFile(String nameFile);
+    
 }

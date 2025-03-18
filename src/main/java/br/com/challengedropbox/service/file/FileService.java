@@ -1,11 +1,13 @@
 package br.com.challengedropbox.service.file;
 
+import br.com.challengedropbox.commons.exceptions.file.ErrorDeleteFileException;
 import br.com.challengedropbox.commons.exceptions.file.ErrorSaveFileException;
 import br.com.challengedropbox.commons.exceptions.file.ErrorVerifyFileException;
 import br.com.challengedropbox.commons.exceptions.ftp.ErrorConectFtpException;
 import br.com.challengedropbox.commons.exceptions.ftp.ErrorDisconnectFtpException;
 import br.com.challengedropbox.commons.exceptions.user.ErrorUserNotFoundException;
 import br.com.challengedropbox.mapper.file.FileEntityToUploadResponseMapper;
+import br.com.challengedropbox.model.file.request.FileDeleteRequest;
 import br.com.challengedropbox.model.file.response.FileResponse;
 import br.com.challengedropbox.model.file.response.FileUploadResponse;
 import br.com.challengedropbox.repository.file.FileRepository;
@@ -192,6 +194,33 @@ public class FileService {
         }
 
         return files.subList(fromIndex, toIndex);
+    }
+
+    public void deleteFilesUser(FileDeleteRequest request) {
+
+        if (!verifyUserExists(request.getIdUser())) {
+            throw new ErrorUserNotFoundException();
+        }
+
+        connectServerFTP();
+
+        enterDirectoryUser(request.getIdUser());
+
+        request.getNameFiles()
+            .forEach(name -> {
+                try {
+                    boolean deleted = ftpClient.deleteFile(name);
+                    if (deleted) {
+                        fileRepository.deleteByNameFile(name);
+                    } else {
+                        throw new ErrorDeleteFileException(name);
+                    }
+                } catch (IOException e) {
+                    throw new ErrorDeleteFileException(name);
+                }
+            });
+
+        disconnectFTP();
     }
 
 }

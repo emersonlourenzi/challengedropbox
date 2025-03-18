@@ -19,6 +19,7 @@ public enum ErrorException {
     ERROR_CONECT_SERVER_FTP("8", "Ocorreu um erro ao conectar ao servidor FTP"),
     ERROR_SAVE_FILE("9", "Ocorreu um erro ao salvar arquivo"),
     ERROR_VERIFY_FILE("9", "Ocorreu um erro ao verificar arquivo"),
+    ERROR_DELETE_FILE("10", "Ocorreu um erro ao deletar o arquivo"),
     ;
 
     private final String code;
