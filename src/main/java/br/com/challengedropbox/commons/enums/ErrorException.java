@@ -20,6 +20,7 @@ public enum ErrorException {
     ERROR_SAVE_FILE("9", "Ocorreu um erro ao salvar arquivo"),
     ERROR_VERIFY_FILE("9", "Ocorreu um erro ao verificar arquivo"),
     ERROR_DELETE_FILE("10", "Ocorreu um erro ao deletar o arquivo"),
+    ERROR_DOWNLOAD_FILE("11", "Ocorreu um erro ao baixar o arquivo"),
     ;
 
     private final String code;
