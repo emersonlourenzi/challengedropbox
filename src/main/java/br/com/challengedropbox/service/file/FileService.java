@@ -1,6 +1,7 @@
 package br.com.challengedropbox.service.file;
 
 import br.com.challengedropbox.commons.exceptions.file.ErrorDeleteFileException;
+import br.com.challengedropbox.commons.exceptions.file.ErrorDownloadFileException;
 import br.com.challengedropbox.commons.exceptions.file.ErrorSaveFileException;
 import br.com.challengedropbox.commons.exceptions.file.ErrorVerifyFileException;
 import br.com.challengedropbox.commons.exceptions.ftp.ErrorConectFtpException;
@@ -8,6 +9,7 @@ import br.com.challengedropbox.commons.exceptions.ftp.ErrorDisconnectFtpExceptio
 import br.com.challengedropbox.commons.exceptions.user.ErrorUserNotFoundException;
 import br.com.challengedropbox.mapper.file.FileEntityToUploadResponseMapper;
 import br.com.challengedropbox.model.file.request.FileDeleteRequest;
+import br.com.challengedropbox.model.file.request.FileDownloadRequest;
 import br.com.challengedropbox.model.file.response.FileResponse;
 import br.com.challengedropbox.model.file.response.FileUploadResponse;
 import br.com.challengedropbox.repository.file.FileRepository;
@@ -16,14 +18,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.net.ftp.FTPClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static br.com.challengedropbox.mapper.file.FileEntityMapper.toFileEntityMapper;
 import static br.com.challengedropbox.mapper.file.FileResponseMapper.INSTANCE;
@@ -223,4 +230,35 @@ public class FileService {
         disconnectFTP();
     }
 
+    public ByteArrayResource downloadFiles(FileDownloadRequest request) {
+        ByteArrayOutputStream zipOutputStream = new ByteArrayOutputStream();
+        ZipOutputStream zip = new ZipOutputStream(zipOutputStream);
+
+        connectServerFTP();
+
+        enterDirectoryUser(request.getIdUser());
+
+        request.getNameFiles()
+            .forEach(name -> {
+                try {
+                    InputStream inputStream = ftpClient.retrieveFileStream(name);
+                    zip.putNextEntry(new ZipEntry(name));
+                    inputStream.transferTo(zip);
+                    zip.closeEntry();
+                    ftpClient.completePendingCommand();
+                } catch (IOException e) {
+                    throw new ErrorDownloadFileException();
+                } finally {
+                    disconnectFTP();
+                }
+            });
+
+        try {
+            zip.close();
+        } catch (IOException e) {
+            throw new ErrorDownloadFileException();
+        }
+
+        return new ByteArrayResource(zipOutputStream.toByteArray());
+    }
 }
